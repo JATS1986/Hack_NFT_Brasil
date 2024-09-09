@@ -42,8 +42,8 @@ Icone 2 - FILE EXPLORER
 Criar o arquivo
 CrossChainPriceNFT.sol
 
-// Inicio
-
+********************************* Início do código *********************************
+```solidity
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
@@ -212,13 +212,84 @@ contract CrossChainPriceNFT is ERC721, ERC721URIStorage {
         super._burn(tokenId);
     }
 }
-
-// Fim
+```
+****************************** Fim do código *************************************************
 
 #### Explicando o contrato CrossChainPriceNFT.sol
 
-1. 
+1. Licença, Pragma e Comentário de Deploy:
+- // SPDX-License-Identifier: MIT: Esta linha especifica a licença MIT usada pelo contrato.
+- pragma solidity 0.8.19;: Define a versão Solidity utilizada para compilar o contrato (versão 0.8.19).
+- // Deploy this contract on Sepolia: Um comentário lembrando que o contrato deve ser implantado na rede de teste Sepolia.
 
+2. Importações de Bibliotecas
+- Estas linhas importam bibliotecas necessárias para o funcionamento do contrato:
+    - @openzeppelin/contracts/…: Importa funcionalidades para tokens ERC721 (ERC721URIStorage) e utilitários como contador (Counters) e codificação base64 (Base64).
+    - @chainlink/contracts/…: Importa interfaces para interagir com o serviço de oráculo de preços Chainlink (AggregatorV3Interface).
+
+3. Definição do Contrato e Contador
+- contract CrossChainPriceNFT is ERC721, ERC721URIStorage: Esta linha define o contrato CrossChainPriceNFT que herda funcionalidades de ambos os padrões ERC721 (NFT básico) e ERC721URIStorage (permite armazenar a URI do token na blockchain).
+- using Counters for Counters.Counter;: Habilita o uso de funções de contador para o tokenIdCounter.
+- using Strings for uint256;: Permite converter valores inteiros em strings (necessário para criar JSON).
+
+4. Preço do Oráculo e Emojis
+- Counters.Counter public tokenIdCounter;: Declara um contador público para atribuir IDs únicos a cada NFT cunhado.
+- AggregatorV3Interface internal priceFeed;: Esta linha declara uma variável interna do tipo AggregatorV3Interface para interagir com o contrato Chainlink que fornece o preço do ativo.
+- uint256 public lastPrice = 0;: Armazena o último preço obtido do feed de dados.
+- Três variáveis string definem emojis indicadores para variação de preço (priceIndicatorUp, priceIndicatorDown, e priceIndicatorFlat).
+
+5. Estrutura ChainStruct e Construtor
+- struct ChainStruct { ... }: Define uma estrutura nomeada ChainStruct para armazenar informações sobre as blockchains suportadas:
+    - uint64 code: Código único da blockchain.
+    - string name: Nome da blockchain.
+    - string color: Cor que representa a blockchain em formato HTML.
+- O construtor constructor() executa as seguintes ações:
+    - Inicializa o padrão ERC721 com um nome ("CrossChain Price") e símbolo ("CCPrice").
+    - Cria entradas no mapeamento chain para três redes de teste (Sepolia, Fuji, Mumbai) com seus códigos, nomes e cores.
+    - Define a variável priceFeed para o endereço do feed de preço BTC/USD da rede Sepolia.
+    - Cria automaticamente um NFT inicial para o deployer do contrato (usando mint(msg.sender)).
+
+6. Função mint
+- function mint(address to) public { ... }: Esta função pública permite cunhar um novo NFT para um determinado endereço (to).
+- Internamente, ela chama mintFrom(to, 0) que assume a criação do NFT na rede Sepolia (ID da rede 0).
+
+7. Função mintFrom
+- function mintFrom(address to, uint256 sourceId) public { ... }: Esta função pública permite cunhar um NFT especificando a ID da rede de origem (sourceId).
+- Recupera a ID atual do token do contador.
+- Cria um novo NFT com essa ID para o destinatário (to).
+- Chama a função updateMetaData para gerar e definir a URI inicial do token com base na rede de origem.
+Incrementa o contador de ID do token.
+
+8. Função updateMetaData
+- function updateMetaData(uint256 tokenId, uint256 sourceId) public { ... }: Esta função pública atualiza os metadados de um NFT existente.
+    - Chama a função interna buildSVG para gerar uma string SVG representando o NFT.
+    - Codifica a string SVG em base64 usando a biblioteca Base64.
+    - Cria uma string JSON contendo os metadados do NFT, incluindo nome, descrição, imagem (SVG codificado) e atributos (rede de origem e preço).
+    - Combina a string JSON com um prefixo para criar o URI final do token.
+    - Define o URI final do token usando _setTokenURI.
+
+9. Função buildSVG
+- function buildSVG(uint256 sourceId) internal returns (string memory) { ... }: Esta função interna cria a string SVG que representa o NFT.
+    - Gera o código SVG para um retângulo com a cor correspondente à rede de origem.
+    - Gera o código SVG para um texto que exibe o emoji indicando a variação de preço.
+    - Combina os códigos SVG do retângulo e do texto para criar o SVG final.
+
+10. Função comparePrice
+- function comparePrice() public returns (string memory) { ... }: Esta função pública compara o preço atual com o preço anterior e retorna o emoji correspondente.
+    - Obtém o preço atual usando getChainlinkDataFeedLatestAnswer.
+    - Compara o preço atual com o preço anterior e atualiza a variável priceIndicator com o emoji adequado.
+    - Retorna o emoji indicando a variação de preço.
+
+11. Função getChainlinkDataFeedLatestAnswer
+- function getChainlinkDataFeedLatestAnswer() public view returns (uint256) { ... }: Esta função pública obtém o último preço do feed de dados Chainlink.
+    - Utiliza a função latestRoundData do contrato AggregatorV3Interface para obter os dados da última rodada.
+    - Retorna o valor do preço como um uint256.
+
+12. Funções tokenURI e _burn
+- function tokenURI(uint256 tokenId) ...: Sobrescreve a função tokenURI para retornar o URI do token.
+- function _burn(uint256 tokenId) internal override ...: Sobrescreve a função _burn para queimar um NFT.
+
+----------------------------------------------------------------------------------------------------
 Icone 5 - DEPLOY & RUN TRANSACTIONS
 Deploy
 
@@ -264,8 +335,8 @@ Price
 Criar
 CrossDestinationMinter.sol
 
-// Inicio
-
+********************************* Início do código *********************************
+```solidity
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
@@ -321,9 +392,61 @@ contract CrossDestinationMinter is CCIPReceiver {
         nft = InftMinter(nftAddress);
     }
 }
+```
+********************************* Fim do código *********************************
 
-// Fim
+#### Explicando o contrato CrossChainPriceNFT.sol
 
+1. Licença e Pragma
+- // SPDX-License-Identifier: MIT: Define a licença MIT usada pelo contrato.
+- pragma solidity 0.8.19;: Especifica a versão Solidity utilizada para compilar o contrato (versão 0.8.19).
+
+2. Importações
+- import {CCIPReceiver} from "@chainlink/contracts-ccip/src/v0.8/ccip/applications/CCIPReceiver.sol";: Importa a funcionalidade CCIPReceiver da biblioteca Chainlink CCIP para receber mensagens entre blockchains.
+- import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";: Importa a biblioteca Client da Chainlink CCIP para lidar com mensagens de forma mais genérica (não utilizada diretamente neste contrato).
+
+3. Interface InftMinter
+- Define uma interface InftMinter com a função mintFrom para abstrair a interação com o contrato de cunhagem de NFTs. Essa interface permite que qualquer contrato que implemente a função mintFrom seja utilizado pelo CrossDestinationMinter.
+
+4. Contrato CrossDestinationMinter
+- contract CrossDestinationMinter is CCIPReceiver**: Define o contrato CrossDestinationMinter que herda a funcionalidade CCIPReceiver para receber mensagens entre blockchains.
+
+5. Variável nft
+- InftMinter public nft;: Declara uma variável pública do tipo InftMinter para armazenar o endereço do contrato de cunhagem de NFT.
+
+6. Evento MintCallSuccessfull
+- event MintCallSuccessfull();: Define um evento para registrar quando uma chamada de cunhagem de NFT é bem-sucedida.
+
+7. Endereço do Roteador Sepolia
+- // https://docs.chain.link/ccip/supported-networks/testnet: Comentário com um link para a documentação sobre redes suportadas pelo CCIP (aqui indicando a rede de teste Sepolia).
+- address routerSepolia = 0x0BF3dE8c5D3e8A2B34D2BEeB17ABfCeBaf363A59;: Define o endereço do Roteador CCIP para a rede Sepolia (usado para validação de mensagens).
+
+8. Construtor (constructor)
+- constructor(address nftAddress) CCIPReceiver(routerSepolia) { ... }: O construtor recebe o endereço do contrato de cunhagem de NFT como argumento e:
+    - Chama o construtor da classe base CCIPReceiver passando o endereço do roteador Sepolia.
+    - Inicializa a variável nft com o endereço do contrato de cunhagem de NFT fornecido.
+
+9. Função _ccipReceive
+- function _ccipReceive(Client.Any2EVMMessage memory message) internal override { ... }: Esta função interna sobreescreve a função herdada _ccipReceive.
+    - Ela é chamada automaticamente quando o contrato recebe uma mensagem CCIP.
+    - A função verifica se a mensagem foi bem-sucedida e, em seguida, tenta executar os dados da mensagem (message.data) como uma chamada de função no contrato de cunhagem de NFT (address(nft))
+    - Se a chamada for bem-sucedida, o evento MintCallSuccessfull é emitido.
+
+10. Função testMint
+- function testMint() external { ... }: Esta função pública simula uma chamada de cunhagem de NFT na rede Sepolia.
+    - Ela chama diretamente a função mintFrom do contrato de cunhagem de NFT, passando o endereço do remetente da transação (msg.sender) e o ID da rede Sepolia (0).
+
+11. Função testMessage
+- function testMessage() external { ... }: Esta função pública demonstra como enviar uma mensagem CCIP para cunhar um NFT na rede Sepolia.
+    - Ela codifica uma chamada à função mintFrom do contrato de cunhagem de NFT, passando o endereço do remetente e o ID da rede Sepolia.
+    - Em seguida, ela tenta executar essa mensagem como uma chamada de função no contrato de cunhagem de NFT.
+    - Se a chamada for bem-sucedida, o evento MintCallSuccessfull é emitido.
+
+12. Função updateNFT
+- function updateNFT(address nftAddress) external { ... }: Esta função pública permite atualizar o endereço do contrato de cunhagem de NFT.
+    - Ela atribui o novo endereço à variável nft.
+
+-------------------------------------------------------------------------------
 Deploy
 Parametro - Endereço do NFT
 
@@ -382,8 +505,8 @@ Icon2 2 - FILE EXPLORER
 Criar
 CrossSourceMinter.sol
 
-// Inicio
-
+******************************* Início do código *******************************
+```solidity
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
@@ -469,9 +592,71 @@ contract CrossSourceMinter {
         linkToken.transfer(beneficiary, amount);
     }
 }
+```
+***************************** Fim do código *****************************
 
-// Fim
+#### Explicando o contrato CrossChainPriceNFT.sol
 
+1. Licença e Pragma
+- // SPDX-License-Identifier: MIT: Define a licença MIT usada pelo contrato.
+- pragma solidity 0.8.19;: Especifica a versão Solidity utilizada para compilar o contrato (versão 0.8.19).
+
+2. Importações
+- import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol";: Importa a interface IRouterClient da biblioteca Chainlink CCIP para interagir com o roteador CCIP.
+- import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";: Importa a biblioteca Client da Chainlink CCIP para auxiliar na construção e envio de mensagens CCIP.
+- import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";: Importa a interface LinkTokenInterface para interagir com o contrato do token LINK da Chainlink.
+
+3. Contrato CrossSourceMinter
+- contract CrossSourceMinter { ... }: Define o contrato CrossSourceMinter responsável por enviar mensagens de cunhagem de NFT para outra blockchain.
+
+4. Definição de Erros Personalizados
+- Define dois erros personalizados para fornecer mensagens de reversão mais informativas:
+    - NotEnoughBalance: Indica que o contrato não tem saldo suficiente para cobrir as taxas de envio da mensagem.
+    - NothingToWithdraw: Indica que não há saldo de LINK para ser retirado. 
+
+5. Variáveis de Estado
+- IRouterClient public router;: Armazena o endereço do roteador CCIP com o qual o contrato se comunica.
+LinkTokenInterface public linkToken;: Armazena o endereço do contrato do token LINK da Chainlink.
+uint64 public destinationChainSelector;: Armazena o identificador da blockchain destino (Sepolia neste caso).
+- address public owner;: Armazena o endereço do proprietário do contrato.
+- address public destinationMinter;: Armazena o endereço do contrato de cunhagem de NFT na blockchain destino.
+
+6. Evento MessageSent
+- Define um evento para registrar o envio de uma mensagem CCIP e seu identificador.
+
+7. Construtor (constructor)
+- constructor(address destMinterAddress) { ... }: O construtor recebe o endereço do contrato de cunhagem de NFT na blockchain destino como argumento e:
+    - Define o endereço do proprietário do contrato como o remetente da transação (msg.sender).
+    - Carrega os endereços do roteador CCIP e do contrato LINK na rede Fuji a partir de valores codificados (não use em produção).
+    - Aprova o gasto ilimitado de LINK para o roteador CCIP (somente para fins de demonstração).
+    - Define o identificador da blockchain destino (Sepolia).
+    - Define o endereço do contrato de cunhagem de NFT na blockchain destino. 
+
+8. Função mintOnSepolia
+- function mintOnSepolia() external { ... }: Esta função pública permite solicitar a cunhagem de um NFT na blockchain destino (Sepolia).
+    - Constrói uma mensagem CCIP do tipo EVM2AnyMessage para solicitar a cunhagem:
+    - Define o endereço do contrato de cunhagem de NFT na blockchain destino como receptor da mensagem.
+    - Codifica a chamada à função mintFrom do contrato de cunhagem de NFT, passando o endereço do remetente da transação (msg.sender) e o ID da rede Fuji (1).
+    - Define que não há tokens para enviar junto com a mensagem.
+    - Define os argumentos extras da mensagem, incluindo o limite de gás desejado (980_000).
+    - Define o token LINK como token de pagamento das taxas.
+- Obtém a taxa necessária para enviar a mensagem usando router.getFee.
+- Verifica se o contrato possui saldo suficiente de LINK para pagar as taxas.
+- Envia a mensagem CCIP usando router.ccipSend e armazena o identificador da mensagem.
+- Emite o evento MessageSent para indicar que a mensagem foi enviada com sucesso.
+
+9. Modificador onlyOwner
+- modifier onlyOwner() { ... }: Este modificador restringe a execução de uma função ao proprietário do contrato. 
+
+10. Função linkBalance
+- function linkBalance (address account) public view returns (uint256) { ... }: Esta função pública retorna o saldo de LINK de um determinado endereço.
+
+11. Função withdrawLINK
+- function withdrawLINK(address beneficiary) public onlyOwner { ... }: Esta função pública permite que o proprietário do contrato retire o saldo de LINK do contrato para um endereço especificado.
+    - Verifica se há saldo de LINK para retirar.
+    - Transfere o saldo de LINK para o endereço do beneficiário.
+
+---------------------------------------------------------------------------------------
 Deploy
 Parametro: CrossDestinationMinter address
 (contrato que voce publicou antes, na Sepolia)
