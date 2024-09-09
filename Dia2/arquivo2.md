@@ -73,8 +73,8 @@ Icone 2 - FILE EXPLORER
 Criar o arquivo
 Flower.sol
 
-// Inicio
-
+************************************** Início do código **************************************
+```solidity
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
@@ -180,10 +180,75 @@ contract Flower is ERC721, ERC721URIStorage, AutomationCompatibleInterface {
     }
 
 }
+```
+******************************* Fim do código **********************************************
 
-// Fim
+#### Explicando o código Flower:
 
-*******************************
+1. Declarações iniciais:
+- SPDX-License-Identifier: MIT: Define a licença MIT para o código.
+- pragma solidity 0.8.19: Indica a versão do Solidity utilizada (0.8.19).
+
+2. Importações:
+- import "@chainlink/contracts/src/v0.8/AutomationCompatible.sol": Interface da Chainlink Automation para contratos automatizados.
+- @openzeppelin/contracts/…: Importa bibliotecas do OpenZeppelin para funcionalidades de NFT (ERC721 e ERC721URIStorage) e utilitários (Counters - para contagem de tokens).
+
+
+3. Contrato Flower:
+- contract Flower is ERC721, ERC721URIStorage, AutomationCompatibleInterface: Ele herda ERC721, ERC721URIStorage e AutomationCompatibleInterface:
+    - ERC721: Padrão básico de tokens não fungíveis (NFTs).
+    - ERC721URIStorage: Extensão do ERC721 que permite armazenar o URI do token no próprio contrato.
+    - AutomationCompatibleInterface: para contratos automatizados.
+
+4. Usando bibliotecas:
+- using Counters for Counters.Counter: Habilita o uso de funções de contagem para o contador de tokens (tokenIdCounter).
+- using Strings for uint256: Habilita a conversão de números inteiros para strings (necessário para gerar o JSON do token).
+
+5. URIs de Metadados:
+- IpfsUri: Array contendo os links IPFS para os metadados de cada estágio da flor (semente, broto e flor).
+
+6. Intervalo e Registro de Tempo:
+- interval: Intervalo de tempo (em segundos) para a atualização automática da arte do NFT.
+- lastTimeStamp: Timestamp do último update automático.
+
+7. Construtor: 
+- constructor(uint updateInterval) ERC721("Flower Bootcamp 2024", "FLO"):
+    - Define o nome e o símbolo do NFT.
+    - Armazena o intervalo de atualização.
+    - Inicializa o registro de tempo.
+    - Cria automaticamente um NFT para o remetente da transação.
+
+8. Função safeMint:
+- Cria um novo NFT e associa o URI da "semente" ao token.
+
+9. Função flowerStage:
+- Verifica o estágio atual da flor com base no URI do token.
+
+10. Função growFlower:
+- Permite o crescimento da flor (mudança de arte) se ela ainda não estiver totalmente florida.
+- Atualiza o URI do token para o próximo estágio de crescimento.
+
+11. Função compareStrings: 
+- Função auxiliar para comparar strings de forma segura.
+
+12. Função checkUpkeep (Chainlink Automation):
+- Verifica se a atualização automática é necessária:
+    - Compara o tempo atual com o registro de tempo da última atualização.
+    - Verifica se a flor ainda não atingiu o estágio final.
+    - Se a atualização for necessária, retorna true.
+
+13. Função performUpkeep (Chainlink Automation):
+- Executada automaticamente pela Chainlink Automation quando a atualização é necessária.
+    - Atualiza o registro de tempo.
+    - Chama a função growFlower para mudar a arte do NFT.
+
+14. Função tokenURI:
+- Override da função herdada para priorizar a implementação do ERC721URIStorage.
+
+15. Função _burn:
+- Override necessária do método _burn herdado do ERC721URIStorage para queima de NFTs.
+
+-----------------------------------------------------------------------------------------
 
 Icone 5 - DEPLOY & RUN TRANSACTIONS
 Parametro: intervalo em segundos
@@ -293,8 +358,6 @@ Alexandre - https://automation.chain.link/sepolia/241917469815933729557311231545
 MAIKAO - https://automation.chain.link/sepolia/38448210265576605393133029530411429822690637781644181799032494447946263077663
 Jeff Souza - https://automation.chain.link/sepolia/48992081194064071002280309814155912342648165063973592479700924168848102355808
 
-
-
 Novo item na colecao (item 3)
 SafeMint
 
@@ -306,8 +369,8 @@ Runners.sol
 
 Copiar entre o inicio e o fim
 
-// inicio 
-
+***************************************** Começa o Codigo *****************************************
+```solidity
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
@@ -505,8 +568,8 @@ contract Runners is ERC721, ERC721URIStorage, VRFConsumerBaseV2Plus  {
         super._burn(tokenId);
     }
 }
-
-// fim
+```
+************************************* Acaba o código *************************************
 
 #### Explicando o código Runners:
 
@@ -558,7 +621,6 @@ contract Runners is ERC721, ERC721URIStorage, VRFConsumerBaseV2Plus  {
     - name: Nome do corredor.
     - image: Link IPFS da imagem do corredor.
     - distance: Distância percorrida pelo corredor inicialmente.
-
 
 https://vrf.chain.link/
 Connect wallet
